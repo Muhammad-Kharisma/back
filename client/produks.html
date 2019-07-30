@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Client</title>
+	<link rel="stylesheet" type="text/css" href="css/app.css">
+</head>
+<body>
+	
+	<div id="app" class="container">
+		<div v-if="form == true">
+			<br>	
+			<h3 style="text-align: center;">
+				<strong>Tambah Data Produks</strong>
+			</h3>
+			<hr>
+			<div>
+				<div class="form-group row">
+					<label>Nama Produks</label>
+					<input type="text" class="form-control" id="nama_produks">
+				</div>
+				<div class="form-group row">
+					<label>Stock</label>
+					<input type="text" class="form-control" id="jumlah">
+				</div>
+				<div class="form-group row">
+					<label>Harga Beli</label>
+					<input type="text" class="form-control" id="hargabeli">
+				</div>
+				<div class="form-group row">
+					<label>Harga Jual</label>
+					<input type="text" class="form-control" id="hargajual">
+				</div>
+				<hr>
+				<div class="form-group">
+					<button class="btn btn-success" v-on:click="simpan()">
+						Simpan
+					</button>
+					<button class="btn btn-danger" v-on:click="form = !form">
+						Batal
+					</button>
+				</div>
+			</div>
+		</div>
+		<div v-if="form == false">		
+			<br>
+			<h3 style="text-align: center;">
+				<strong>Menampilkan Data Produks</strong>
+			</h3>
+			<hr>
+			<button class="btn btn-primary float-right" v-on:click="form = !form">
+				Tambah
+			</button>
+			<br>
+			<br>
+			<table class="table table-hover table-striped">
+				<thead style="background-color: pink;">
+					<tr>
+						<td><strong>ID</strong></td>
+						<td><strong>Nama</strong></td>
+						<td><strong>Jumlah</strong></td>
+						<td><strong>Kategori</strong></td>
+						<td><strong>Harga Beli</strong></td>
+						<td><strong>Harga Jual</strong></td>
+						<td><strong>About</strong></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="i in items">
+						<td>{{ i.id }}</td>
+						<td>{{ i.nama_produks }}</td>
+						<td>{{ i.jumlah }}</td>
+						<td>{{ i.kategori.nama_kategori }}</td>
+						<td>{{ i.hargabeli }}</td>
+						<td>{{ i.hargajual }}</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- <script src="js/app.js"></script> -->
+	<script src="js/vue.js"></script>
+	<script src="js/axios.min.js"></script>
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: { 
+				items: [], 
+				form: false, 
+			},
+			mounted(){
+				this.fetchProduks();
+			},
+			methods: {
+				fetchProduks() {
+					var self = this;
+					axios.get('http://localhost:8000/api/get-produks')
+					.then(function(response) {
+						console.log(response.data);
+						self.items = response.data;
+					})
+					.catch(function(error) {
+						console.log(error)
+					})
+				},
+				simpan() {
+					var i_nama = document.getElementById("nama").value
+					var i_qty = document.getElementById("qty").value
+					var i_harga_beli = document.getElementById("harga_beli").value
+					var i_harga_jual = document.getElementById("harga_jual").value
+
+					var self = this;
+					axios.post("http://localhost:8000/api/get-produks", {
+						nama : i_nama,
+						qty : i_qty,
+						harga_beli : i_harga_beli,
+						harga_jual : i_harga_jual,
+						
+					})
+					.then(function(response) {
+						console.log(response);
+						if (response.data.status == true) {
+							self.form = !self.form
+							self.fetchProduks()
+						} else {
+							alert("Data Gagal Disimpan!")
+						}
+					})
+					.catch(function(error) {
+						console.log(error);
+					})
+				}
+			}
+		})
+	</script>
+</body>
+</html>
